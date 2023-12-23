@@ -8,6 +8,8 @@ pub struct Vec3 {
     pub z: f32
 }
 
+pub type Point3 = Vec3;
+
 impl ops::Add for Vec3 {
     type Output = Self;
     
