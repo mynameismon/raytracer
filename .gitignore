@@ -1,1 +1,7 @@
 /target
+
+# Hide image outputs
+images/
+
+# Remove Emacs junk
+~
