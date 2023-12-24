@@ -130,7 +130,7 @@ impl fmt::Display for Vec3 {
 
 #[allow(dead_code)]
 impl Vec3 {
-    pub fn new () -> Vec3 {
+    pub const fn new () -> Vec3 {
 	Vec3 {
 	    x: 0.0,
 	    y: 0.0,
@@ -138,7 +138,7 @@ impl Vec3 {
 	}
     }
 
-    pub fn from_point (x: f32, y: f32, z: f32) -> Vec3 {
+    pub const fn from_point (x: f32, y: f32, z: f32) -> Vec3 {
 	Vec3 {
 	    x,
 	    y,
@@ -158,7 +158,7 @@ impl Vec3 {
 	self / self.length()
     }
 
-    pub fn dot_self (self) -> f32 {
+    pub fn norm (self) -> f32 {
 	self.length_sq()
     }
 
@@ -167,7 +167,7 @@ impl Vec3 {
 	    + self.y * rhs.y
 	    + self.z * rhs.z
     }
-
+    
     pub fn cross (self, rhs: Vec3) -> Vec3 {
 	Self {
 	    x: self.y * rhs.z - self.z * rhs.y,
@@ -175,4 +175,12 @@ impl Vec3 {
 	    z: self.x * rhs.y - self.y * rhs.x
 	}
     }
+}
+
+pub fn dot (u: Vec3, v: Vec3) -> f32 {
+    u.dot(v)
+}
+
+pub fn cross (u: Vec3, v: Vec3) -> Vec3 {
+    u.cross(v)
 }

@@ -1,5 +1,6 @@
 use crate::vec3::{Vec3, Point3};
 
+#[derive(Debug, Clone, Copy)]
 pub struct Ray {
     pub origin: Point3,
     pub direction: Vec3
@@ -7,17 +8,21 @@ pub struct Ray {
 
 #[allow(dead_code)]
 impl Ray {
-    pub fn new () -> Ray {
+    pub const fn new () -> Ray {
 	Ray {
 	    origin: Point3::new(),
 	    direction: Vec3::new()
 	}
     }
 
-    pub fn construct (origin: Vec3, direction: Point3) -> Ray {
+    pub const fn construct (origin: Vec3, direction: Point3) -> Ray {
 	Ray {
 	    origin,
 	    direction
 	}
+    }
+
+    pub fn at (self, t: f32) -> Vec3 {
+	self.origin + t * self.direction
     }
 }
