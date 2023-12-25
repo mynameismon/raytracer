@@ -1,3 +1,5 @@
+use rand::{distributions::Uniform, Rng};
+
 use core::f32::INFINITY;
 use crate::vec3::{Vec3, Point3};
 use crate::hittable::{Hittable, World};
@@ -7,23 +9,25 @@ use crate::ray::Ray;
 pub struct Camera {
     pub aspect_ratio: f32,
     pub image_width: u32,
+    pub samples_per_pixel: u32,
 
     image_height: u32,
     camera_center: Point3,
     init_pixel_loc: Point3,
 
     delta_u: Vec3,
-    delta_v: Vec3
+    delta_v: Vec3,
 }
 
 type Colour = Vec3;
 
 #[allow(dead_code)]
 impl Camera {        
-    pub fn new (aspect_ratio: f32, image_width: u32) -> Self {
+    pub fn new (aspect_ratio: f32, image_width: u32, samples_per_pixel: u32) -> Self {
 	Self {
 	    aspect_ratio,
 	    image_width,
+	    samples_per_pixel,
 	    image_height: 0,
 	    camera_center: Vec3::new(),
 	    init_pixel_loc: Vec3::new(),
@@ -62,22 +66,39 @@ impl Camera {
 	self
     }
 
+    fn pixel_sample_square (&self, (x, y): (f32, f32)) -> Vec3 {
+	0.5 * x * self.delta_u + 0.5 * y * self.delta_v
+    }
+    
+    fn get_ray (&self, i: u32, j: u32, rand: (f32, f32)) -> Ray {
+	let pixel_center = self.init_pixel_loc
+	    + (i as f32) * self.delta_u
+	    + (j as f32) * self.delta_v
+	    + self.pixel_sample_square(rand);
+	
+	Ray::construct(self.camera_center, pixel_center - self.camera_center)
+    }
+
     pub fn render (&self, world: &World) {
 	self.debug();
 	
 	println!("P3");
 	println!("{} {}", self.image_width, self.image_height);
 	println!("255");
+
+	let range = Uniform::from(0.0..1.0);
+	let mut rng = rand::thread_rng();
+	
 	for j in 0..self.image_height{
 	    eprint!("\rNumber of lines remaining: {}", self.image_height - j);
 
 	    for i in 0..self.image_width {
-		let pixel_center = self.init_pixel_loc
-		    + (i as f32) * self.delta_u
-		    + (j as f32) * self.delta_v;
 
-		let pixel = ray_colour(&Ray::construct(self.camera_center, pixel_center - self.camera_center), world);
-		
+		let pixel = (0..self.samples_per_pixel)
+		    .map(|_| (rng.sample(&range), rng.sample(&range)))
+		    .map(|rand| ray_colour(&self.get_ray(i, j, rand), world))
+		    .fold(Vec3::new(), |sum, x| sum + x) / self.samples_per_pixel as f32;
+
 		println!("{}", pixel);
 	    }
 	}

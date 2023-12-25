@@ -177,10 +177,12 @@ impl Vec3 {
     }
 }
 
+#[allow(dead_code)]
 pub fn dot (u: Vec3, v: Vec3) -> f32 {
     u.dot(v)
 }
 
+#[allow(dead_code)]
 pub fn cross (u: Vec3, v: Vec3) -> Vec3 {
     u.cross(v)
 }

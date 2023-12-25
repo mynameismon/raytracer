@@ -10,7 +10,7 @@ mod hittable;
 mod camera;
 
 fn main() {
-    let camera: Camera = Camera::new(16.0/9.0, 1000);
+    let camera: Camera = Camera::new(16.0/9.0, 1000, 10);
     
     let mut world: World = World::new();
     world.push(Box::new(Sphere::from_dim(Vec3::from_point(0.0, 0.0, -1.0), 0.5)));

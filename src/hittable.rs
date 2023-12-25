@@ -2,6 +2,7 @@ use crate::vec3::{Vec3, Point3};
 use crate::ray::Ray;
 use std::ops::Range;
 
+#[allow(dead_code)]
 pub struct HitRecord {
     pub point: Point3,
     pub normal: Vec3,
@@ -10,13 +11,14 @@ pub struct HitRecord {
     front: bool
 }
 
+#[allow(dead_code)]
 impl HitRecord {
     pub fn new (point: Point3, normal: Vec3, t: f32) -> Self {
 	Self {
 	    point,
 	    normal,
 	    t,
-	    front: false
+	    front: true
 	}
     }
     
@@ -34,7 +36,6 @@ impl HitRecord {
 pub trait Hittable {
     fn hit (&self, r: &Ray, t_range: Range<f32>) -> Option<HitRecord>;
 }
-
 
 pub type World = Vec<Box<dyn Hittable>>;
 
