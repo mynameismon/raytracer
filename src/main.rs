@@ -21,7 +21,8 @@ fn main() {
     let ground: Arc<Lambertian> = Arc::new(Lambertian::new(Vec3::from_point(0.8, 0.8, 0.0)));
     let center: Arc<Lambertian> = Arc::new(Lambertian::new(Vec3::from_point(0.7, 0.3, 0.3)));
     let left: Arc<Metal> = Arc::new(Metal::new(Vec3::from_point(0.8, 0.8, 0.8), 0.2));
-    let right: Arc<Dielectric> = Arc::new(Dielectric::new(3.0));
+    let right: Arc<Dielectric> = Arc::new(Dielectric::new(1.5));
+    let right_inner = right.clone();
 
     let mut world: World = World::new();
     world.push(Box::new(Sphere::from_dim(
@@ -44,6 +45,11 @@ fn main() {
         Vec3::from_point(1.0, 0.0, -1.0),
         0.5,
         right,
+    )));
+     world.push(Box::new(Sphere::from_dim(
+        Vec3::from_point(1.0, 0.0, -1.0),
+        -0.4,
+        right_inner,
     )));
 
     camera.render(&world);

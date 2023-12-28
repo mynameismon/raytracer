@@ -212,9 +212,9 @@ impl Vec3 {
     }
 
     pub fn refract_along(self, normal: Vec3, rel_ri: f32) -> Vec3 {
-        let cos_theta = self.dot(normal).min(1.0);
+        let cos_theta = (-self).dot(normal).min(1.0);
         let perpendicular = rel_ri * (self + cos_theta * normal);
-        let parallel = -(1.0 - perpendicular.norm()).abs().sqrt() * normal;
+        let parallel = -(1.0 - perpendicular.length_sq()).abs().sqrt() * normal;
 
         perpendicular + parallel
     }

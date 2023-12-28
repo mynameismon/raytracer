@@ -78,17 +78,18 @@ impl Material for Dielectric {
     fn scatter(&self, r_in: &Ray, rec: &HitRecord) -> Option<Reflect> {
         let refractive_index = if rec.front { 1.0 / self.eta } else { self.eta };
 
-        let cos_theta = r_in.direction.unit().dot(rec.normal).min(1.0);
-        let sin_theta = (1.0 - cos_theta * cos_theta).sqrt();
+	let unit = r_in.direction.unit();
+	
+        let cos_theta = (-1.0 * unit).dot(rec.normal).min(1.0);
+        let sin_theta = (1.0 - cos_theta.powi(2)).sqrt();
 
-        let direction = if sin_theta * refractive_index > 1.0
-            || refractance(cos_theta, refractive_index) > random()
-        {
-            r_in.direction.reflect_along(rec.normal)
+	let cannot_refract = (sin_theta * refractive_index) > 1.0;
+	let will_reflect = reflectance(cos_theta, refractive_index) > random();
+	
+        let direction = if cannot_refract || will_reflect {
+            unit.reflect_along(rec.normal)
         } else {
-            r_in.direction
-                .unit()
-                .refract_along(rec.normal, refractive_index)
+            unit.refract_along(rec.normal, refractive_index)
         };
 
         Some(Reflect {
@@ -98,9 +99,7 @@ impl Material for Dielectric {
     }
 }
 
-fn refractance(cos_theta: f32, ri: f32) -> f32 {
-    let r0 = (1.0 - ri) / (1.0 + ri);
-    let r = r0 * r0;
-
-    r + (1.0 - r) * (1.0 - cos_theta).powf(5.0)
+fn reflectance(cos_theta: f32, ri: f32) -> f32 {
+    let r0 = ((1.0 - ri) / (1.0 + ri)).powi(2);
+    r0 + (1.0 - r0) * (1.0 - cos_theta).powi(5)
 }

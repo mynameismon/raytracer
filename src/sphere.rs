@@ -53,14 +53,19 @@ impl Hittable for Sphere {
         } else if t_range.contains(&pos_root) {
             root = Some(pos_root);
         }
-
+	
         root.map(|x| {
-            HitRecord::new(
+	    let outward_normal = (r.at(x) - self.centre) / self.radius;
+	    
+            let mut rec = HitRecord::new(
                 r.at(x),
                 (r.at(x) - self.centre) / self.radius,
                 x,
                 self.material.clone(),
-            )
+            );
+
+	    rec.set_face_normal(r, outward_normal);
+	    rec
         })
     }
 }
