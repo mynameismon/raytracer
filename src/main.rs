@@ -2,10 +2,11 @@ use std::sync::Arc;
 
 use camera::Camera;
 use hittable::World;
-use material::{Dielectric, Lambertian, Metal};
+use material::{Material, Dielectric, Lambertian, Metal};
 use sphere::Sphere;
 use vec3::Vec3;
-// use material::{Metal, Lambertian};
+use utils::{random, random_range};
+
 
 mod camera;
 mod hittable;
@@ -16,41 +17,59 @@ mod utils;
 mod vec3;
 
 fn main() {
-    let camera: Camera = Camera::new(16.0 / 9.0, 500, 100, 20);
-
-    let ground: Arc<Lambertian> = Arc::new(Lambertian::new(Vec3::from_point(0.8, 0.8, 0.0)));
-    let center: Arc<Lambertian> = Arc::new(Lambertian::new(Vec3::from_point(0.7, 0.3, 0.3)));
-    let left: Arc<Metal> = Arc::new(Metal::new(Vec3::from_point(0.8, 0.8, 0.8), 0.2));
-    let right: Arc<Dielectric> = Arc::new(Dielectric::new(1.5));
-    let right_inner = right.clone();
-
     let mut world: World = World::new();
-    world.push(Box::new(Sphere::from_dim(
-        Vec3::from_point(0.0, -100.5, -1.0),
-        100.0,
-        ground,
-    )));
+    
+    let camera: Camera = Camera::new(
+        16.0 / 9.0,
+        1200,
+        100,
+        50,
+	60.0,
+        0.6,
+	10.0,
+        Vec3::from_point(13.0, 2.0, 3.0),
+        Vec3::from_point(0.0, 0.0, 0.0),
+        Vec3::from_point(0.0, 1.0, 0.0),
+    );
 
-    world.push(Box::new(Sphere::from_dim(
-        Vec3::from_point(0.0, 0.0, -1.0),
-        0.5,
-        center,
-    )));
-    world.push(Box::new(Sphere::from_dim(
-        Vec3::from_point(-1.0, 0.0, -1.0),
-        0.5,
-        left,
-    )));
-    world.push(Box::new(Sphere::from_dim(
-        Vec3::from_point(1.0, 0.0, -1.0),
-        0.5,
-        right,
-    )));
-     world.push(Box::new(Sphere::from_dim(
-        Vec3::from_point(1.0, 0.0, -1.0),
-        -0.4,
-        right_inner,
-    )));
+    let ground: Arc<Lambertian> = Arc::new(Lambertian::new(Vec3::from_point(0.5, 0.5, 0.5)));
+    let glass: Arc<Dielectric> = Arc::new(Dielectric::new(1.5));
 
+    world.push(Box::new(Sphere::from_dim(Vec3::from_point(0.0, -1000.0, 0.0), 1000.0, ground)));
+
+    for a in -11..11 {
+	for b in -11..11 {
+	    let val = random();
+
+	    let center = Vec3::from_point(a as f32 + 0.9 * val, 0.2, b as f32 + 0.9 * val);
+
+	    if (center - Vec3::from_point(4.0, 0.2, 0.0)).length() < 0.9 {
+		continue
+	    }
+	    
+	    let material_choice = random();
+	    let mat: Arc<dyn Material> = if material_choice < 0.6 {
+		// Lambertian
+		let albedo = Vec3::random() * Vec3::random();
+		Arc::new(Lambertian::new(albedo))
+	    } else if material_choice < 0.9 {
+		// Metal
+		let albedo = Vec3::random_range(0.5..1.0);
+		let fuzz = random_range(0.0..0.5);
+
+		Arc::new(Metal::new(albedo, fuzz))
+	    } else {
+		// Dielectric
+		glass.clone()
+	    };
+
+	    world.push(Box::new(Sphere::from_dim(center, 0.2, mat)));
+	}
+    }
+
+    world.push(Box::new(Sphere::from_dim(Vec3::from_point(0.0, 1.0, 0.0), 1.0, glass.clone())));
+    world.push(Box::new(Sphere::from_dim(Vec3::from_point(-4.0, 1.0, 0.0), 1.0, Arc::new(Lambertian::new(Vec3::from_point(0.4, 0.2, 0.1))))));
+    world.push(Box::new(Sphere::from_dim(Vec3::from_point(4.0, 1.0, 0.0), 1.0, Arc::new(Metal::new(Vec3::from_point(1.0, 0.6, 0.6), 0.0)))));
+    
     camera.render(&world);
 }

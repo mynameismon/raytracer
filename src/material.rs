@@ -78,14 +78,14 @@ impl Material for Dielectric {
     fn scatter(&self, r_in: &Ray, rec: &HitRecord) -> Option<Reflect> {
         let refractive_index = if rec.front { 1.0 / self.eta } else { self.eta };
 
-	let unit = r_in.direction.unit();
-	
+        let unit = r_in.direction.unit();
+
         let cos_theta = (-1.0 * unit).dot(rec.normal).min(1.0);
         let sin_theta = (1.0 - cos_theta.powi(2)).sqrt();
 
-	let cannot_refract = (sin_theta * refractive_index) > 1.0;
-	let will_reflect = reflectance(cos_theta, refractive_index) > random();
-	
+        let cannot_refract = (sin_theta * refractive_index) > 1.0;
+        let will_reflect = reflectance(cos_theta, refractive_index) > random();
+
         let direction = if cannot_refract || will_reflect {
             unit.reflect_along(rec.normal)
         } else {
