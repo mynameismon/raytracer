@@ -5,5 +5,12 @@ edition = "2021"
 
 # See more keys and their definitions at https://doc.rust-lang.org/cargo/reference/manifest.html
 
+[package.metadata.flux]
+enabled = true
+
+[profile.release]
+debug = true
+
 [dependencies]
 rand = { version = "0.8.5", features = ["small_rng"] }
+rayon = "1.8.0"

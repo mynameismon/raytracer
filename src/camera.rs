@@ -1,3 +1,5 @@
+use rayon::prelude::*;
+
 use crate::hittable::{Hittable, World};
 use crate::ray::Ray;
 use crate::utils::{random, random_range};
@@ -144,10 +146,11 @@ impl Camera {
             eprint!("\rNumber of lines remaining: {}", self.image_height - j);
 
             for i in 0..self.image_width {
-                let pixel = (0..self.samples_per_pixel)
+                let pixel: Vec3 = (0..self.samples_per_pixel)
+                    .into_par_iter()
                     .map(|_| ray_colour(&self.get_ray(i, j), world, self.max_depth))
-                    .fold(Vec3::new(), |sum, x| sum + x)
-                    / self.samples_per_pixel as f32;
+                    .reduce(|| Vec3::new(), |sum, x| sum + x)
+		    / self.samples_per_pixel as f32;
 
                 println!("{}", pixel);
             }
