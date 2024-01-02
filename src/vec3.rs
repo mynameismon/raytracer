@@ -14,6 +14,7 @@ pub type Point3 = Vec3;
 impl ops::Add for Vec3 {
     type Output = Self;
 
+    #[inline]
     fn add(self, rhs: Self) -> Self {
         Self {
             x: self.x + rhs.x,
@@ -24,6 +25,7 @@ impl ops::Add for Vec3 {
 }
 
 impl ops::AddAssign for Vec3 {
+    #[inline]
     fn add_assign(&mut self, rhs: Self) {
         *self = Self {
             x: self.x + rhs.x,
@@ -36,6 +38,7 @@ impl ops::AddAssign for Vec3 {
 impl ops::Neg for Vec3 {
     type Output = Self;
 
+    #[inline]
     fn neg(self) -> Self {
         Self {
             x: -self.x,
@@ -48,6 +51,7 @@ impl ops::Neg for Vec3 {
 impl ops::Sub for Vec3 {
     type Output = Self;
 
+    #[inline]
     fn sub(self, rhs: Self) -> Self {
         Self {
             x: self.x - rhs.x,
@@ -58,6 +62,7 @@ impl ops::Sub for Vec3 {
 }
 
 impl ops::SubAssign for Vec3 {
+    #[inline]
     fn sub_assign(&mut self, rhs: Self) {
         *self = Self {
             x: self.x - rhs.x,
@@ -70,6 +75,7 @@ impl ops::SubAssign for Vec3 {
 impl ops::Mul<f32> for Vec3 {
     type Output = Vec3;
 
+    #[inline]
     fn mul(self, t: f32) -> Vec3 {
         Vec3 {
             x: self.x * t,
@@ -82,6 +88,7 @@ impl ops::Mul<f32> for Vec3 {
 impl ops::Mul<Vec3> for f32 {
     type Output = Vec3;
 
+    #[inline]
     fn mul(self, rhs: Vec3) -> Vec3 {
         rhs * self
     }
@@ -90,6 +97,7 @@ impl ops::Mul<Vec3> for f32 {
 impl ops::Mul<Vec3> for Vec3 {
     type Output = Vec3;
 
+    #[inline]
     fn mul(self, rhs: Vec3) -> Vec3 {
         Self {
             x: self.x * rhs.x,
@@ -100,6 +108,7 @@ impl ops::Mul<Vec3> for Vec3 {
 }
 
 impl ops::MulAssign<f32> for Vec3 {
+    #[inline]
     fn mul_assign(&mut self, t: f32) {
         *self = Self {
             x: self.x * t,
@@ -112,6 +121,7 @@ impl ops::MulAssign<f32> for Vec3 {
 impl ops::Div<f32> for Vec3 {
     type Output = Vec3;
 
+    #[inline]
     fn div(self, t: f32) -> Vec3 {
         Vec3 {
             x: self.x / t,
@@ -122,6 +132,7 @@ impl ops::Div<f32> for Vec3 {
 }
 
 impl ops::DivAssign<f32> for Vec3 {
+    #[inline]
     fn div_assign(&mut self, t: f32) {
         *self = Self {
             x: self.x / t,
@@ -132,6 +143,7 @@ impl ops::DivAssign<f32> for Vec3 {
 }
 
 impl fmt::Display for Vec3 {
+    #[inline]
     fn fmt(&self, f: &mut fmt::Formatter) -> fmt::Result {
         write!(
             f,
@@ -153,10 +165,12 @@ impl Vec3 {
         }
     }
 
+    #[inline]
     pub const fn from_point(x: f32, y: f32, z: f32) -> Vec3 {
         Vec3 { x, y, z }
     }
 
+    #[inline]
     pub fn random() -> Vec3 {
         Self {
             x: random(),
@@ -165,6 +179,7 @@ impl Vec3 {
         }
     }
 
+    #[inline]
     pub fn random_range(r: ops::Range<f32>) -> Vec3 {
         Self {
             x: random_range(r.clone()),
@@ -173,26 +188,32 @@ impl Vec3 {
         }
     }
 
+    #[inline]
     pub fn length_sq(self) -> f32 {
         self.x * self.x + self.y * self.y + self.z * self.z
     }
 
+    #[inline]
     pub fn length(self) -> f32 {
         self.length_sq().sqrt()
     }
 
+    #[inline]
     pub fn unit(self) -> Vec3 {
         self / self.length()
     }
 
+    #[inline]
     pub fn norm(self) -> f32 {
         self.length_sq()
     }
 
+    #[inline]
     pub fn dot(self, rhs: Vec3) -> f32 {
         self.x * rhs.x + self.y * rhs.y + self.z * rhs.z
     }
 
+    #[inline]
     pub fn cross(self, rhs: Vec3) -> Vec3 {
         Self {
             x: self.y * rhs.z - self.z * rhs.y,
@@ -201,12 +222,14 @@ impl Vec3 {
         }
     }
 
+    #[inline]
     pub fn near_zero(self) -> bool {
         let e: f32 = 1e-6;
 
         self.x.abs() < e && self.y.abs() < e && self.z.abs() < e
     }
 
+    #[inline]
     pub fn reflect_along(self, normal: Vec3) -> Vec3 {
         self - 2.0 * self.dot(normal) * normal
     }
@@ -221,15 +244,18 @@ impl Vec3 {
 }
 
 #[allow(dead_code)]
+#[inline]
 pub fn dot(u: Vec3, v: Vec3) -> f32 {
     u.dot(v)
 }
 
 #[allow(dead_code)]
+#[inline]
 pub fn cross(u: Vec3, v: Vec3) -> Vec3 {
     u.cross(v)
 }
 
+#[inline]
 pub fn random_unit_vector() -> Vec3 {
     loop {
         let v = Vec3::random_range(-1.0..1.0);
@@ -239,6 +265,8 @@ pub fn random_unit_vector() -> Vec3 {
     }
 }
 
+#[allow(dead_code)]
+#[inline]
 pub fn random_unit_hemisphere(normal: Vec3) -> Vec3 {
     let rand_vector = random_unit_vector();
 
@@ -249,10 +277,14 @@ pub fn random_unit_hemisphere(normal: Vec3) -> Vec3 {
     }
 }
 
+#[allow(dead_code)]
+#[inline]
 pub fn reflect(v: Vec3, normal: Vec3) -> Vec3 {
     v.reflect_along(normal)
 }
 
+#[allow(dead_code)]
+#[inline]
 pub fn refract(v: Vec3, normal: Vec3, rel_ri: f32) -> Vec3 {
     v.refract_along(normal, rel_ri)
 }
