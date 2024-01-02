@@ -5,3 +5,7 @@ images/
 
 # Remove Emacs junk
 *~
+
+# Hide the books
+*.html
+*_files/*
