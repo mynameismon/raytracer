@@ -5,6 +5,7 @@ use crate::vec3::{dot, Point3, Vec3};
 use std::ops::Range;
 use std::sync::Arc;
 
+/// A sphere is represented very simply using a center, a radius and a material.
 pub struct Sphere {
     pub centre: Point3,
     pub radius: f32,
@@ -13,6 +14,7 @@ pub struct Sphere {
 
 #[allow(dead_code)]
 impl Sphere {
+    /// Creates a new sphere from the given dimensions
     pub const fn from_dim(centre: Point3, radius: f32, material: Arc<dyn Material>) -> Self {
         Self {
             centre,
@@ -23,19 +25,24 @@ impl Sphere {
 }
 
 impl Hittable for Sphere {
-    // Idea: A ray intersects a sphere only if ||(A + Bt)|| <= r^2
-    // We can resolve this as a quadratic equation in terms of t,
-    // that can be solved easily using the quadratic equation.
-    //
-    // Here, the ray direction represents Bt, while A = center - ray origin
+    /// A ray intersects a sphere only if ||(A + Bt)|| <= r^2
+    /// We can resolve this as a quadratic equation in terms of t,
+    /// that can be solved easily using the quadratic equation.
+    ///
+    /// Here, the ray direction represents Bt, while A = center - ray origin
+    /// 
+    /// It is important to set the outward normal as this will define what direction
+    /// will the ray continue in. If the outward normal is not defined correctly,
+    /// it would cause refracted rays to also return in the direction of the incident
+    /// ray, causing major problems.
     #[allow(non_snake_case)]
     fn hit(&self, r: &Ray, t_range: Range<f32>) -> Option<HitRecord> {
         let A: Vec3 = r.origin - self.centre;
         let B: Vec3 = r.direction;
 
-        let a = B.norm();
+        let a = B.length_sq();
         let half_b = dot(A, B);
-        let c = A.norm() - (self.radius * self.radius);
+        let c = A.length_sq() - (self.radius * self.radius);
 
         let discriminant = half_b * half_b - a * c;
         if discriminant < 0.0 {

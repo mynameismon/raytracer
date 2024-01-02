@@ -8,15 +8,22 @@ pub struct Reflect {
     pub scattered: Ray,
 }
 
+/// Allows the creation of different materials.
 pub trait Material: Send + Sync {
+    /// Calculates the scattering of a ray, based on the various properties of a given material.
     fn scatter(&self, r_in: &Ray, rec: &HitRecord) -> Option<Reflect>;
 }
 
+/// A Lambertian material relfects light according to Lambertian reflectance.
+/// This contributes to diffused reflections, giving Lambertian surfaces a
+/// matte finish.
+/// Albedo is the ratio of the reflectance.
 pub struct Lambertian {
     albedo: Point3,
 }
 
 impl Lambertian {
+    /// Creates a new Lambertian matertial.
     pub fn new(albedo: Point3) -> Self {
         Self { albedo }
     }
@@ -37,6 +44,8 @@ impl Material for Lambertian {
     }
 }
 
+/// A metal surface is very similar to a Lambertian surface, with the exception
+/// that all the light is reflected back as is. 
 pub struct Metal {
     albedo: Point3,
     fuzz: f32,
@@ -64,6 +73,10 @@ impl Material for Metal {
     }
 }
 
+/// A dielectric surface, like water, or glass, has a characteristic reflection
+/// pattern. Here, however, we are not concerned with details like polarization,
+/// largely worried about the refraction of light in the medium, which can change
+/// due to the refractive index of the medium.
 pub struct Dielectric {
     pub eta: f32,
 }

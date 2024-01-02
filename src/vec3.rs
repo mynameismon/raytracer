@@ -2,6 +2,7 @@ use crate::utils::{random, random_range};
 use core::fmt;
 use core::ops;
 
+/// Easy way to define a 3 dimensional vector and corresponding properties.
 #[derive(Debug, Clone, Copy)]
 pub struct Vec3 {
     pub x: f32,
@@ -157,6 +158,7 @@ impl fmt::Display for Vec3 {
 
 #[allow(dead_code)]
 impl Vec3 {
+    /// Creates a zero vector
     pub const fn new() -> Vec3 {
         Vec3 {
             x: 0.0,
@@ -165,11 +167,13 @@ impl Vec3 {
         }
     }
 
+    /// Creates a new vector from a given set of coordinates.
     #[inline]
     pub const fn from_point(x: f32, y: f32, z: f32) -> Vec3 {
         Vec3 { x, y, z }
     }
 
+    /// Creates a random vector
     #[inline]
     pub fn random() -> Vec3 {
         Self {
@@ -179,6 +183,8 @@ impl Vec3 {
         }
     }
 
+    /// Creates a random vector that has random coordinates.
+    /// Each coordinate is chosen from the given range uniformly and independently.
     #[inline]
     pub fn random_range(r: ops::Range<f32>) -> Vec3 {
         Self {
@@ -188,31 +194,37 @@ impl Vec3 {
         }
     }
 
+    /// Returns the length of the vector, squared.
     #[inline]
     pub fn length_sq(self) -> f32 {
         self.x * self.x + self.y * self.y + self.z * self.z
     }
 
+    /// Returns the length of the vector
     #[inline]
     pub fn length(self) -> f32 {
         self.length_sq().sqrt()
     }
-
+    
+    /// Returns a unit vector pointing in the same direction as the original vector
     #[inline]
     pub fn unit(self) -> Vec3 {
         self / self.length()
     }
 
+    /// Returns the 2-norm of the product, which is most commonly used form of norm in CG.
     #[inline]
     pub fn norm(self) -> f32 {
         self.length_sq()
     }
 
+    /// Returns the dot product of a vector with another vector ``b``
     #[inline]
     pub fn dot(self, rhs: Vec3) -> f32 {
         self.x * rhs.x + self.y * rhs.y + self.z * rhs.z
     }
 
+    /// Returns the 3-D cross product of a vector with another vector
     #[inline]
     pub fn cross(self, rhs: Vec3) -> Vec3 {
         Self {
@@ -222,6 +234,9 @@ impl Vec3 {
         }
     }
 
+    /// Checks if a vector is near 0 or no.
+    /// This is required due to the inaccuracy of floating point
+    /// calculations, which can result in vectors close to but not exactly 0.
     #[inline]
     pub fn near_zero(self) -> bool {
         let e: f32 = 1e-6;
@@ -229,11 +244,15 @@ impl Vec3 {
         self.x.abs() < e && self.y.abs() < e && self.z.abs() < e
     }
 
+    /// Reflects a vector along a given normal and returns the reflected vector
     #[inline]
     pub fn reflect_along(self, normal: Vec3) -> Vec3 {
         self - 2.0 * self.dot(normal) * normal
     }
 
+
+    /// Refracts a vector along a given normal in a medium with refractive index rel_ri.
+    /// This assumes that the incident ray is in refractive index 1.
     pub fn refract_along(self, normal: Vec3, rel_ri: f32) -> Vec3 {
         let cos_theta = (-self).dot(normal).min(1.0);
         let perpendicular = rel_ri * (self + cos_theta * normal);
@@ -243,18 +262,21 @@ impl Vec3 {
     }
 }
 
+/// Calculates the dot product of two vectors
 #[allow(dead_code)]
 #[inline]
 pub fn dot(u: Vec3, v: Vec3) -> f32 {
     u.dot(v)
 }
 
+/// Calculates the cross product of two vectors
 #[allow(dead_code)]
 #[inline]
 pub fn cross(u: Vec3, v: Vec3) -> Vec3 {
     u.cross(v)
 }
 
+/// Generates a random vector of unit length
 #[inline]
 pub fn random_unit_vector() -> Vec3 {
     loop {
@@ -265,6 +287,8 @@ pub fn random_unit_vector() -> Vec3 {
     }
 }
 
+/// Generates a random vector that lies in the hemisphere contained by the
+/// normal given
 #[allow(dead_code)]
 #[inline]
 pub fn random_unit_hemisphere(normal: Vec3) -> Vec3 {
@@ -277,12 +301,15 @@ pub fn random_unit_hemisphere(normal: Vec3) -> Vec3 {
     }
 }
 
+
+/// Reflects a vector along a given normal vector
 #[allow(dead_code)]
 #[inline]
 pub fn reflect(v: Vec3, normal: Vec3) -> Vec3 {
     v.reflect_along(normal)
 }
 
+/// Refracts a vector, given a normal and the relative refractive index of the medium
 #[allow(dead_code)]
 #[inline]
 pub fn refract(v: Vec3, normal: Vec3, rel_ri: f32) -> Vec3 {
