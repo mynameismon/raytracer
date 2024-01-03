@@ -7,22 +7,32 @@ use std::sync::Arc;
 
 /// A sphere is represented very simply using a center, a radius and a material.
 pub struct Sphere {
-    pub centre: Point3,
+    pub center: Ray,
     pub radius: f32,
-    pub material: Arc<dyn Material>,
+    pub material: Arc<dyn Material>
 }
 
 #[allow(dead_code)]
 impl Sphere {
     /// Creates a new sphere from the given dimensions
-    pub const fn from_dim(centre: Point3, radius: f32, material: Arc<dyn Material>) -> Self {
+    pub const fn stationary_from_dim (center: Point3, radius: f32, material: Arc<dyn Material>) -> Self {
         Self {
-            centre,
+            center: Ray::construct(center, Vec3::new(), 0.0),
             radius,
             material,
         }
     }
+
+    pub const fn moving_from_dim (center: Ray, radius: f32, material: Arc<dyn Material>) -> Self {
+        Self {
+            center,
+            radius,
+            material
+        }
+    }
 }
+
+// TODO: Implement a moving sphere. This requires keeping track of the time at which the intersectinos take place
 
 impl Hittable for Sphere {
     /// A ray intersects a sphere only if ||(A + Bt)|| <= r^2
@@ -37,7 +47,9 @@ impl Hittable for Sphere {
     /// ray, causing major problems.
     #[allow(non_snake_case)]
     fn hit(&self, r: &Ray, t_range: Range<f32>) -> Option<HitRecord> {
-        let A: Vec3 = r.origin - self.centre;
+	let center = self.center.at(r.time);
+	
+        let A: Vec3 = r.origin - center;
         let B: Vec3 = r.direction;
 
         let a = B.length_sq();
@@ -62,11 +74,11 @@ impl Hittable for Sphere {
         }
 
         root.map(|x| {
-            let outward_normal = (r.at(x) - self.centre) / self.radius;
+            let outward_normal = (r.at(x) - center) / self.radius;
 
             let mut rec = HitRecord::new(
                 r.at(x),
-                (r.at(x) - self.centre) / self.radius,
+                (r.at(x) - center) / self.radius,
                 x,
                 self.material.clone(),
             );

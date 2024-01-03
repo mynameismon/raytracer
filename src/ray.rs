@@ -6,6 +6,7 @@ use crate::vec3::{Point3, Vec3};
 pub struct Ray {
     pub origin: Point3,
     pub direction: Vec3,
+    pub time: f32
 }
 
 #[allow(dead_code)]
@@ -15,12 +16,13 @@ impl Ray {
         Ray {
             origin: Point3::new(),
             direction: Vec3::new(),
+	    time: 0.0
         }
     }
 
     /// Constructs a new ray from the point and direction
-    pub const fn construct(origin: Vec3, direction: Point3) -> Ray {
-        Ray { origin, direction }
+    pub const fn construct(origin: Vec3, direction: Point3, time: f32) -> Ray {
+        Ray { origin, direction, time}
     }
 
     /// Calculates the point at ``t`` distance from the origin of the ray

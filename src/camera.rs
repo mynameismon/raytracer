@@ -150,7 +150,7 @@ impl Camera {
 	    self.sample_disc()
 	};
 	
-        Ray::construct(ray_origin, pixel_center - ray_origin)
+        Ray::construct(ray_origin, pixel_center - ray_origin, random())
     }
 
     /// Renders the given world using the given camera settings.
