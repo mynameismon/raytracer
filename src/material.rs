@@ -2,6 +2,7 @@ use crate::hittable::HitRecord;
 use crate::ray::Ray;
 use crate::utils::random;
 use crate::vec3::{random_unit_vector, Point3, Vec3};
+use crate::texture::Texture;
 
 pub struct Reflect {
     pub attenuation: Point3,
@@ -18,18 +19,18 @@ pub trait Material: Send + Sync {
 /// This contributes to diffused reflections, giving Lambertian surfaces a
 /// matte finish.
 /// Albedo is the ratio of the reflectance.
-pub struct Lambertian {
-    albedo: Point3,
+pub struct Lambertian <T: Texture + Sync + Send> {
+    albedo: T,
 }
 
-impl Lambertian {
+impl<T: Texture + Sync + Send> Lambertian<T> {
     /// Creates a new Lambertian matertial.
-    pub fn new(albedo: Point3) -> Self {
+    pub fn new (albedo: T) -> Self {
         Self { albedo }
     }
 }
 
-impl Material for Lambertian {
+impl<T: Texture + Sync + Send> Material for Lambertian<T> {
     fn scatter(&self, r_in: &Ray, rec: &HitRecord) -> Option<Reflect> {
         let scatter_dir = if (rec.normal + random_unit_vector()).near_zero() {
             rec.normal
@@ -39,7 +40,7 @@ impl Material for Lambertian {
 
         Some(Reflect {
             scattered: Ray::construct(rec.point, scatter_dir, r_in.time),
-            attenuation: self.albedo,
+            attenuation: self.albedo.value(0.0, 0.0, &rec.point),
         })
     }
 }

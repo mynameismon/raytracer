@@ -15,18 +15,22 @@ pub struct HitRecord {
     pub material: Arc<dyn Material>,
 
     pub front: bool,
+    pub u: f32,
+    pub v: f32
 }
 
 #[allow(dead_code)]
 impl HitRecord {
     /// Creates a new instance of [HitRecord]. Assumes that the front face is true by default.
-    pub fn new(point: Point3, normal: Vec3, t: f32, material: Arc<dyn Material>) -> Self {
+    pub fn new(point: Point3, normal: Vec3, t: f32, material: Arc<dyn Material>, u: f32, v: f32) -> Self {
         Self {
             point,
             normal,
             t,
             material,
             front: true,
+	    u,
+	    v
         }
     }
 

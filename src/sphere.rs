@@ -30,6 +30,16 @@ impl Sphere {
             material
         }
     }
+
+    fn get_uv (&self, r: &Vec3) -> (f32, f32) {
+	let theta = (-r.y).acos();
+	let phi = r.z.atan2(-r.x) + std::f32::consts::PI;
+
+	(
+	    phi / (2.0 * std::f32::consts::PI),
+	    theta / std::f32::consts::PI
+	)
+    }
 }
 
 // TODO: Implement a moving sphere. This requires keeping track of the time at which the intersectinos take place
@@ -76,11 +86,15 @@ impl Hittable for Sphere {
         root.map(|x| {
             let outward_normal = (r.at(x) - center) / self.radius;
 
+	    let (u, v) = self.get_uv(&outward_normal);
+	    
             let mut rec = HitRecord::new(
                 r.at(x),
                 (r.at(x) - center) / self.radius,
                 x,
                 self.material.clone(),
+		u,
+		v
             );
 
             rec.set_face_normal(r, outward_normal);

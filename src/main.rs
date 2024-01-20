@@ -7,7 +7,7 @@ use sphere::Sphere;
 use vec3::Vec3;
 use ray::Ray;
 use utils::{random, random_range};
-
+use texture::Solid;
 
 mod camera;
 mod hittable;
@@ -16,13 +16,14 @@ mod ray;
 mod sphere;
 mod utils;
 mod vec3;
+mod texture;
 
 fn main() {
     let mut world: World = World::new();
     
     let camera: Camera = Camera::new(
         16.0 / 9.0,
-	1200,
+	400,
         100,
         50,
 	20.0,
@@ -33,9 +34,10 @@ fn main() {
         Vec3::from_point(0.0, 1.0, 0.0),
     );
 
-    let ground: Arc<Lambertian> = Arc::new(Lambertian::new(Vec3::from_point(0.5, 0.5, 0.5)));
+
     let glass: Arc<Dielectric> = Arc::new(Dielectric::new(1.5));
 
+    let ground: Arc<Lambertian<Solid>> = Arc::new(Lambertian::new(Solid::from_colour(0.5, 0.5, 0.5)));
     world.push(Box::new(Sphere::stationary_from_dim(Vec3::from_point(0.0, -1000.0, 0.0), 1000.0, ground)));
 
     for a in -11..11 {
